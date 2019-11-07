@@ -4,17 +4,18 @@
 
 Yanghao Li\*, Yuntao Chen\*, Naiyan Wang, Zhaoxiang Zhang
 
-[[`TridentNet`](https://github.com/TuSimple/simpledet/tree/master/models/tridentnet)] [[`arXiv`](https://arxiv.org/abs/1802.00434)] [[`BibTeX`](#CitingTridentNet)]
+[[`TridentNet`](https://github.com/TuSimple/simpledet/tree/master/models/tridentnet)] [[`arXiv`](https://arxiv.org/abs/1901.01892)] [[`BibTeX`](#CitingTridentNet)]
 
 <div align="center">
   <img src="https://drive.google.com/uc?export=view&id=10THEPdIPmf3ooMyNzrfZbpWihEBvixwt" width="700px" />
 </div>
 
-In this repository, we implement TridentNet-Fast in the Detectron2 framework. Trident Network (TridentNet) aims to generate scale-specific feature maps with a uniform representational power. We construct a parallel multi-branch architecture in which each branch shares the same transformation parameters but with different receptive fields. TridentNet-Fast is a fast approximation version of TridentNet that could achieve significant improvements without any additional parameters and computational cost.
+In this repository, we implement TridentNet-Fast in Detectron2.
+Trident Network (TridentNet) aims to generate scale-specific feature maps with a uniform representational power. We construct a parallel multi-branch architecture in which each branch shares the same transformation parameters but with different receptive fields. TridentNet-Fast is a fast approximation version of TridentNet that could achieve significant improvements without any additional parameters and computational cost.
 
 ## Training
 
-To train a model one can call
+To train a model, run
 ```bash
 python /path/to/detectron2/projects/TridentNet/train_net.py --config-file <config.yaml>
 ```
@@ -22,15 +23,14 @@ python /path/to/detectron2/projects/TridentNet/train_net.py --config-file <confi
 For example, to launch end-to-end TridentNet training with ResNet-50 backbone on 8 GPUs,
 one should execute:
 ```bash
-python /path/to/detectron2/projects/TridentNet/train_net.py --config-file /path/to/detectron2/projects/TridentNet/configs/tridentnet_fast_R_50_C4_1x.yaml --num_gpus 8
+python /path/to/detectron2/projects/TridentNet/train_net.py --config-file configs/tridentnet_fast_R_50_C4_1x.yaml --num-gpus 8
 ```
 
-## Testing
+## Evaluation
 
-Model testing can be done in the same way as training, except for an additional flag `--eval-only` and
-model location specification through `MODEL.WEIGHT model.pth` in the command line
+Model evaluationcan be done similarly:
 ```bash
-python /path/to/detectron2/projects/TridentNet/train_net.py --config-file /path/to/detectron2/projects/TridentNet/configs/tridentnet_fast_R_50_C4_1x.yaml --eval-only MODEL.WEIGHT model.pth
+python /path/to/detectron2/projects/TridentNet/train_net.py --config-file configs/tridentnet_fast_R_50_C4_1x.yaml --eval-only MODEL.WEIGHTS model.pth
 ```
 
 ## Results on MS-COCO in Detectron2

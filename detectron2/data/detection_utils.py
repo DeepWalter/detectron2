@@ -27,7 +27,7 @@ from .catalog import MetadataCatalog
 
 class SizeMismatchError(ValueError):
     """
-    When loaded image has difference width/height compared with annoation.
+    When loaded image has difference width/height compared with annotation.
     """
 
 
@@ -36,8 +36,8 @@ def read_image(file_name, format=None):
     Read an image into the given format.
 
     Args:
-        dataset_dict (dict): Metadata of one image, in Detectron2 Dataset format.
-        format (dict): one of the supported image modes in PIL, or "BGR"
+        file_name (str): image file path
+        format (str): one of the supported image modes in PIL, or "BGR"
 
     Returns:
         image (np.ndarray): an HWC image
@@ -92,7 +92,7 @@ def transform_proposals(dataset_dict, image_shape, transforms, min_box_side_len,
     "proposal_boxes" and "objectness_logits".
     """
     if "proposal_boxes" in dataset_dict:
-        # Tranform proposal boxes
+        # Transform proposal boxes
         boxes = transforms.apply_box(
             BoxMode.convert(
                 dataset_dict.pop("proposal_boxes"),
@@ -389,8 +389,7 @@ def build_transform_gen(cfg, is_train):
 
     logger = logging.getLogger(__name__)
     tfm_gens = []
-    if not min_size == 0:  # set to zero to disable resize
-        tfm_gens.append(T.ResizeShortestEdge(min_size, max_size, sample_style))
+    tfm_gens.append(T.ResizeShortestEdge(min_size, max_size, sample_style))
     if is_train:
         tfm_gens.append(T.RandomFlip())
         logger.info("TransformGens used in training: " + str(tfm_gens))

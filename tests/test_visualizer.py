@@ -7,7 +7,7 @@ import unittest
 import torch
 
 from detectron2.data import MetadataCatalog
-from detectron2.structures import Instances
+from detectron2.structures import Instances, RotatedBoxes
 from detectron2.utils.visualizer import Visualizer
 
 
@@ -68,8 +68,49 @@ class TestVisualizer(unittest.TestCase):
         v = Visualizer(img, self.metadata)
         v.draw_instance_predictions(inst)
 
+    def test_draw_empty_mask_predictions(self):
+        img, boxes, _, _, masks = self._random_data()
+        num_inst = len(boxes)
+        inst = Instances((img.shape[0], img.shape[1]))
+        inst.pred_classes = torch.randint(0, 80, size=(num_inst,))
+        inst.scores = torch.rand(num_inst)
+        inst.pred_boxes = torch.from_numpy(boxes)
+        inst.pred_masks = torch.from_numpy(np.zeros_like(np.asarray(masks)))
+
+        v = Visualizer(img, self.metadata)
+        v.draw_instance_predictions(inst)
+
     def test_correct_output_shape(self):
         img = np.random.rand(928, 928, 3) * 255
         v = Visualizer(img, self.metadata)
         out = v.output.get_image()
         self.assertEqual(out.shape, img.shape)
+
+    def test_overlay_rotated_instances(self):
+        H, W = 100, 150
+        img = np.random.rand(H, W, 3) * 255
+        num_boxes = 50
+        boxes_5d = torch.zeros(num_boxes, 5)
+        boxes_5d[:, 0] = torch.FloatTensor(num_boxes).uniform_(-0.1 * W, 1.1 * W)
+        boxes_5d[:, 1] = torch.FloatTensor(num_boxes).uniform_(-0.1 * H, 1.1 * H)
+        boxes_5d[:, 2] = torch.FloatTensor(num_boxes).uniform_(0, max(W, H))
+        boxes_5d[:, 3] = torch.FloatTensor(num_boxes).uniform_(0, max(W, H))
+        boxes_5d[:, 4] = torch.FloatTensor(num_boxes).uniform_(-1800, 1800)
+        rotated_boxes = RotatedBoxes(boxes_5d)
+        labels = [str(i) for i in range(num_boxes)]
+
+        v = Visualizer(img, self.metadata)
+        output = v.overlay_instances(boxes=rotated_boxes, labels=labels).get_image()
+        self.assertEqual(output.shape, img.shape)
+
+    def test_draw_no_metadata(self):
+        img, boxes, _, _, masks = self._random_data()
+        num_inst = len(boxes)
+        inst = Instances((img.shape[0], img.shape[1]))
+        inst.pred_classes = torch.randint(0, 80, size=(num_inst,))
+        inst.scores = torch.rand(num_inst)
+        inst.pred_boxes = torch.from_numpy(boxes)
+        inst.pred_masks = torch.from_numpy(np.asarray(masks))
+
+        v = Visualizer(img, MetadataCatalog.get("asdfasdf"))
+        v.draw_instance_predictions(inst)

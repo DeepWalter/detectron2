@@ -254,6 +254,8 @@ def get_detection_dataset_dicts(
     """
     assert len(dataset_names)
     dataset_dicts = [DatasetCatalog.get(dataset_name) for dataset_name in dataset_names]
+    for dataset_name, dicts in zip(dataset_names, dataset_dicts):
+        assert len(dicts), "Dataset '{}' is empty!".format(dataset_name)
 
     if proposal_files is not None:
         assert len(dataset_names) == len(proposal_files)
@@ -318,7 +320,7 @@ def build_detection_train_loader(cfg, mapper=None):
 
     dataset_dicts = get_detection_dataset_dicts(
         cfg.DATASETS.TRAIN,
-        filter_empty=True,
+        filter_empty=cfg.DATALOADER.FILTER_EMPTY_ANNOTATIONS,
         min_keypoints=cfg.MODEL.ROI_KEYPOINT_HEAD.MIN_KEYPOINTS_PER_IMAGE
         if cfg.MODEL.KEYPOINT_ON
         else 0,
@@ -375,7 +377,7 @@ def build_detection_test_loader(cfg, dataset_name, mapper=None):
 
     Returns:
         DataLoader: a torch DataLoader, that loads the given detection
-            dataset, with test-time transformation and batching.
+        dataset, with test-time transformation and batching.
     """
     dataset_dicts = get_detection_dataset_dicts(
         [dataset_name],
