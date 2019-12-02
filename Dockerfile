@@ -2,6 +2,11 @@ FROM nvidia/cuda:10.1-cudnn7-devel
 # To use this Dockerfile:
 # 1. `nvidia-docker build -t detectron2:v0 .`
 # 2. `nvidia-docker run -it --name detectron2 detectron2:v0`
+# 
+# To enable GUI support (Linux):
+# 1. Grant the container temporary access to your x server (will be reverted at reboot of your host): 
+#    `xhost +local:`docker inspect --format='{{ .Config.Hostname }}' detectron2``
+# 2. `nvidia-docker run -it --name detectron2 --env="DISPLAY" --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" detectron2:v0`
 
 
 ENV DEBIAN_FRONTEND noninteractive
@@ -23,7 +28,7 @@ RUN pip install 'git+https://github.com/cocodataset/cocoapi.git#subdirectory=Pyt
 # install detectron2
 RUN git clone https://github.com/facebookresearch/detectron2 /detectron2_repo
 ENV FORCE_CUDA="1"
-ENV TORCH_CUDA_ARCH_LIST="Maxwell;Maxwell+Tegra;Pascal;Volta;Turing"
+ENV TORCH_CUDA_ARCH_LIST="Kepler;Kepler+Tesla;Maxwell;Maxwell+Tegra;Pascal;Volta;Turing"
 RUN pip install -e /detectron2_repo
 
 WORKDIR /detectron2_repo
